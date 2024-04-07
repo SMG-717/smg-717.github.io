@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    background-color: rgb(15 23 42);
+    color: rgb(248 250 252);
+}
+
+#ball-pit {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+}
+
+#ball-1 { fill: #1e293b; }
+#ball-2 { fill: #475569; }
+#ball-3 { fill: #64748b; }
