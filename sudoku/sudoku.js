@@ -1,27 +1,110 @@
+const [gsize, bsize] = [9, 3]
+var grid
+var gridElements
+var statusMessage
 const configurations = [
   ".................................................................................",
-  "123456789234567891345678912456789123567891234678912345789123456891234567912345678",
+  "86.....13.9.......2..1.96.......14...379.......2..75.8.2.71...5.....3726..45.....",
+  ".43..5.2..7.96234...24.7.91.3..5.4....7.9....8.57..16...4..691.51932...7..6.7...4",
+  ".43815726178962345652437891231658479467291538895743162724586913519324687386179254",
 ]
 
+const puzzle = pullConfiguration(3)
 function pullConfiguration(index) {
   return configurations[index].split("").map(a => a === "." ? "" : a)
 }
 
-function registerInput(e, index) {
-  // Do validation before state change
-  e.currentTarget.value = e.data
-  state[index] = e.data
+function checkRegion(region) {
+  return region.sort((a, b) => a - b)
+  .map((e, j) => e == j + 1)
+  .filter(e => !e)
+  .length > 0
 }
+
+function checkWin() {
+  const cells = new Array(gsize).fill(null)
+  for (let i = 0; i < gsize; i += 1) {
+    // Box coords
+    const x = (i % bsize) * bsize
+    const y = i - (i % bsize)
+
+    if (checkRegion(cells.map((_, j) => gridElements[j * gsize + i].value)) ||  // Col
+        checkRegion(cells.map((_, j) => gridElements[i * gsize + j].value)) ||  // Row
+        checkRegion(cells.map((_, j) => gridElements[x  + (j % bsize) + (y + ~~(j / bsize)) * gsize].value))) {  // Box
+      return false
+    }
+  }
+
+  return true
+}
+
+function registerInput(e, index) {
+  /**
+   * Handleable Keys
+   * 
+   * - Digits 1-9: Clear cell if same, clear otherwise.
+   * - Arrow Keys and WASD: Switch to other cell
+   * - Delete or Space: Clear cell
+   */
+
+  const numValue = parseInt(e.key)
+  if (numValue >= 1 && numValue <= 9 && !puzzle[index]) {
+    e.target.value = numValue == e.target.value ? "" : numValue
+
+    if (checkWin()) {
+      statusMessage.innerText = "You win!"
+      statusMessage.classList.remove("lose")
+      statusMessage.classList.add("win")
+    }
+    else {
+      statusMessage.innerText = "You lose."
+      statusMessage.classList.remove("win")
+      statusMessage.classList.add("lose")
+    }
+    return
+  }
+
+  let newIndex = index
+  switch (e.key.toLowerCase()) {
+    case "w": case "arrowup": newIndex -= gsize; break;
+    case "a": case "arrowleft": newIndex -= 1; break;
+    case "s": case "arrowdown": newIndex += gsize; break;
+    case "d": case "arrowright": newIndex += 1 ; break;
+    case " ": e.value = ""; return;
+    case "delete":
+    for (let i = 0; i < puzzle.length; i += 1) {
+      if (!puzzle[i]) {
+        gridElements[i].value = ""
+      }
+    }
+
+    default: return;                  
+  }
+
+  if (newIndex >= 0 && newIndex < gsize * gsize) {
+    gridElements[newIndex].focus()
+  }
+
+}
+
 
 function renderGrid() {
   const items = []
-  for (let i = 0; i < 9; i += 1) {
-    for (let j = 0; j < 9; j += 1) {
+  for (let i = 0; i < gsize; i += 1) {
+    for (let j = 0; j < gsize; j += 1) {
+      const index = 9 * i + j
+      const top = i % bsize == 0 ? " top" : ""
+      const left = j % bsize == 0 ? " left" : ""
+      const right = j == gsize - 1 ? " right" : ""
+      const bottom = i == gsize - 1 ? " bottom" : ""
+      const editable = !puzzle[index] ? " editable" : ""
+
       items.push(
         `<input
-          class="sudokuSqaure"
-          value="${state[i + 9 * j]}"
-          onBeforeInput="registerInput(event,${state[i + 9 * j]})"
+          readonly
+          class="sudokuSquare${top}${left}${right}${bottom}${editable}"
+          value="${puzzle[index]}"
+          onkeydown="registerInput(event,${index})"
           maxLength="1" 
           autoComplete="off" 
           inputMode="numeric"
@@ -31,13 +114,11 @@ function renderGrid() {
     items.push(`<br/>`)
   }
   grid.innerHTML = items.join("")
+  gridElements = grid.getElementsByClassName("sudokuSquare")
 }
-
-var state;
-var grid;
 
 window.onload = () => {
   grid = document.getElementById("sudokuGrid");
-  state = pullConfiguration(1)
+  statusMessage = document.getElementById("status");
   renderGrid()
 }

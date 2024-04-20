@@ -6,8 +6,10 @@
     margin: auto;
 }
 
-.sudokuSqaure {
-    border: 1px solid hsl(0,0,20%);
+.sudokuSquare {
+    border: 1px solid hsl(0,0%,50%);
+    border-right-width: 0;
+    border-bottom-width: 0;
     width: 4rem;
     height: 4rem;
     font-size: 1.875rem;
@@ -17,4 +19,43 @@
     background-color: rgb(15 23 42);
     color: rgb(248 250 252);
     caret-color: transparent;
+}
+
+#status {
+    position: absolute;
+    top: -20px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+#status.win {
+    color: rgb(100, 195, 100);
+}
+
+#status.lose {
+    color: rgb(223, 97, 97);
+}
+
+.sudokuSquare.editable {
+    color: rgb(87, 124, 161);
+}
+
+input:focus {
+    outline: none;
+    background-color: rgb(26, 40, 71);
+}
+
+.sudokuSquare.top {
+    border-top-width: 3px;
+}
+
+.sudokuSquare.bottom {
+    border-bottom-width: 3px;
+}
+
+.sudokuSquare.left {
+    border-left-width: 3px;
+}
+
+.sudokuSquare.right {
+    border-right-width: 3px;
 }
