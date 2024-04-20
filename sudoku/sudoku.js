@@ -9,7 +9,7 @@ const configurations = [
   ".43815726178962345652437891231658479467291538895743162724586913519324687386179254",
 ]
 
-const puzzle = pullConfiguration(3)
+const puzzle = pullConfiguration(2)
 function pullConfiguration(index) {
   return configurations[index].split("").map(a => a === "." ? "" : a)
 }
@@ -23,14 +23,31 @@ function checkRegion(region) {
 
 function checkWin() {
   const cells = new Array(gsize).fill(null)
+  const cols = []
+  const rows = []
+  const boxs = []
+
   for (let i = 0; i < gsize; i += 1) {
     // Box coords
     const x = (i % bsize) * bsize
     const y = i - (i % bsize)
 
-    if (checkRegion(cells.map((_, j) => gridElements[j * gsize + i].value)) ||  // Col
-        checkRegion(cells.map((_, j) => gridElements[i * gsize + j].value)) ||  // Row
-        checkRegion(cells.map((_, j) => gridElements[x  + (j % bsize) + (y + ~~(j / bsize)) * gsize].value))) {  // Box
+    const col = cells.map((_, j) => gridElements[j * gsize + i].value)
+    const row = cells.map((_, j) => gridElements[i * gsize + j].value)
+    const box = cells.map((_, j) => gridElements[x  + (j % bsize) + (y + ~~(j / bsize)) * gsize].value)
+
+    // Check Empty
+    if (col.filter(e => !e).length > 0 || row.filter(e => !e).length > 0 || box.filter(e => !e).length > 0) {
+      return undefined
+    }
+
+    cols.push(col)
+    rows.push(row)
+    boxs.push(box)
+  }
+
+  for (let i = 0; i < gsize; i += 1) {
+    if (checkRegion(cols[i]) || checkRegion(rows[i]) || checkRegion(boxs[i])) { 
       return false
     }
   }
@@ -51,7 +68,13 @@ function registerInput(e, index) {
   if (numValue >= 1 && numValue <= 9 && !puzzle[index]) {
     e.target.value = numValue == e.target.value ? "" : numValue
 
-    if (checkWin()) {
+    const win = checkWin()
+    if (win === undefined) {
+      statusMessage.innerText = ""
+      statusMessage.classList.remove("lose")
+      statusMessage.classList.remove("win")  
+    }
+    else if (win) {
       statusMessage.innerText = "You win!"
       statusMessage.classList.remove("lose")
       statusMessage.classList.add("win")
@@ -70,7 +93,7 @@ function registerInput(e, index) {
     case "a": case "arrowleft": newIndex -= 1; break;
     case "s": case "arrowdown": newIndex += gsize; break;
     case "d": case "arrowright": newIndex += 1 ; break;
-    case " ": e.value = ""; return;
+    case " ": case "space": case "0": e.value = ""; return;
     case "delete":
     for (let i = 0; i < puzzle.length; i += 1) {
       if (!puzzle[i]) {
