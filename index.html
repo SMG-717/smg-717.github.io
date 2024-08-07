@@ -3,11 +3,25 @@
   <head>
     <meta charset="UTF-8">
     <title>SMG</title>
-    <link href="style.css" rel="stylesheet">
+    <link href="global.css" rel="stylesheet">
+    <script> function toggleTheme() { document.documentElement.classList.toggle("dark") } </script>
   </head>
-  <body>
-    <p>Hello world</p>
-    <a href="ball-pit.html">Ball-Pit</a>
-    <a href="/sudoku/index.html">Sudoku</a>
+  <body class="text-foreground bg-background">
+    <div class="fixed top-4 right-4 size-8 cursor-pointer" onclick="toggleTheme()">
+      <i class="absolute m-auto size-8 inset-0 invisible dark:visible" data-lucide="sun"></i>
+      <i class="absolute m-auto size-8 inset-0 visible dark:invisible" data-lucide="moon"></i>
+    </div>
+    <main class="m-8 space-y-2">
+      <h1 class="text-2xl font-bold">Welcome to the SMG Zone</h1>
+      <button type="button" class="border border-slate-500 rounded-md py-2 px-4 hover:bg-foreground hover:text-background" onclick="toggleTheme()">Toggle Theme</button>
+    </main>
+
+
+    <!-- Lucide Stuff -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
+
 </html>
